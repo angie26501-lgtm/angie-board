@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>芸琪的好康推薦 · 異業聯盟</title>
+<style>
+  :root{
+    --paper:#ece2cf;
+    --paper2:#e3d7be;
+    --card:#fdfaf2;
+    --ink:#2c241d;
+    --ink-soft:#6f6151;
+    --line:#d6c8ac;
+    --seal:#bd403a;
+    --ai:#3f6b6c;
+    --shop:#a9772f;
+    --serif:"Noto Serif TC","Songti TC","Songti SC","STSong","PMingLiU",serif;
+    --sans:"PingFang TC","PingFang SC","Microsoft JhengHei","Heiti TC","Noto Sans TC",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255,255,255,.45), transparent 38%),
+      radial-gradient(circle at 85% 0%, rgba(189,64,58,.05), transparent 40%),
+      linear-gradient(160deg, var(--paper), var(--paper2));
+    background-attachment:fixed;
+    line-height:1.7;
+    padding:32px 18px 56px;
+  }
+  .wrap{max-width:600px;margin:0 auto}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;padding:18px 0 34px}
+  .eyebrow{
+    font-size:12px;letter-spacing:.32em;color:var(--ink-soft);
+    text-transform:none;margin-bottom:22px;font-weight:600;
+  }
+  .chop{
+    width:118px;height:118px;margin:0 auto 24px;
+    display:flex;align-items:center;justify-content:center;
+    border:2.5px solid var(--seal);border-radius:16px;
+    color:var(--seal);font-family:var(--serif);font-weight:700;
+    position:relative;transform:rotate(-4deg);
+    box-shadow:0 0 0 4px var(--card), 0 0 0 5.5px rgba(189,64,58,.25);
+  }
+  .chop span{
+    writing-mode:vertical-rl;font-size:34px;letter-spacing:.18em;
+    line-height:1.18;text-indent:.06em;
+  }
+  .hero h1{
+    font-family:var(--serif);font-weight:700;
+    font-size:30px;letter-spacing:.04em;margin-bottom:14px;
+  }
+  .hero p{color:var(--ink-soft);font-size:15.5px;max-width:430px;margin:0 auto}
+  .hero .hint{
+    margin-top:18px;display:inline-block;font-size:13.5px;color:var(--seal);
+    border:1px dashed rgba(189,64,58,.5);border-radius:999px;padding:6px 16px;
+  }
+
+  /* ---------- section ---------- */
+  .section{margin-top:18px}
+  .section + .section{margin-top:40px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin:0 4px 18px}
+  .sec-eyebrow{
+    font-size:11px;letter-spacing:.22em;color:var(--ink-soft);font-weight:600;
+    white-space:nowrap;
+  }
+  .sec-head h2{
+    font-family:var(--serif);font-weight:700;font-size:20px;letter-spacing:.05em;
+    white-space:nowrap;
+  }
+  .sec-head .rule{flex:1;height:1px;background:var(--line)}
+
+  /* ---------- ticket ---------- */
+  .ticket{
+    position:relative;background:var(--card);
+    border:1px solid var(--line);border-radius:15px;
+    padding:24px 24px 20px;margin-bottom:20px;overflow:visible;
+    box-shadow:0 10px 26px -18px rgba(60,44,28,.5);
+    opacity:0;transform:translateY(14px);
+    animation:rise .55s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .ticket:nth-child(2){animation-delay:.06s}
+  .ticket:nth-child(3){animation-delay:.12s}
+  .ticket:nth-child(4){animation-delay:.18s}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  .tag{
+    display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.12em;
+    padding:3px 11px;border-radius:999px;margin-bottom:11px;
+    border:1px solid currentColor;
+  }
+  .ai .tag{color:var(--ai);background:rgba(63,107,108,.07)}
+  .shop .tag{color:var(--shop);background:rgba(169,119,47,.08)}
+
+  .ticket h3{
+    font-family:var(--serif);font-weight:700;font-size:21px;
+    letter-spacing:.03em;padding-right:62px;margin-bottom:4px;
+  }
+  .ticket .tagline{color:var(--ink-soft);font-size:14px;font-weight:600;margin-bottom:9px}
+  .ticket .desc{font-size:14.5px;color:#4a3f33;margin-bottom:14px}
+  .perk{font-size:13px;color:var(--seal);font-weight:600;margin-bottom:4px}
+
+  /* mini seal */
+  .mini-seal{
+    position:absolute;top:18px;right:20px;width:50px;height:50px;
+    border:1.6px solid var(--seal);border-radius:8px;color:var(--seal);
+    font-family:var(--serif);font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-9deg);opacity:.9;letter-spacing:.05em;
+    box-shadow:inset 0 0 0 2.5px var(--card);
+  }
+  .mini-seal span{writing-mode:vertical-rl;line-height:1.15}
+
+  /* perforation */
+  .perf{
+    position:relative;height:0;border-top:2px dashed var(--line);
+    margin:16px -24px 16px;
+  }
+  .perf::before,.perf::after{
+    content:"";position:absolute;top:-11px;width:20px;height:20px;
+    border-radius:50%;background:var(--paper);
+    box-shadow:inset 0 1px 2px rgba(60,44,28,.18);
+  }
+  .perf::before{left:-10px}
+  .perf::after{right:-10px}
+
+  .cta{
+    display:block;text-align:center;text-decoration:none;
+    background:var(--ink);color:#f6efe1;
+    font-size:15px;font-weight:700;letter-spacing:.08em;
+    padding:13px 18px;border-radius:10px;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .cta:hover{background:#1f1812;transform:translateY(-1px)}
+  .cta:active{transform:translateY(0)}
+  .cta .arrow{margin-left:6px}
+
+  a:focus-visible,.cta:focus-visible{outline:3px solid var(--seal);outline-offset:3px}
+
+  /* ---------- footer ---------- */
+  footer{
+    margin-top:46px;text-align:center;color:var(--ink-soft);font-size:13px;
+    border-top:1px solid var(--line);padding-top:24px;
+  }
+  footer strong{font-family:var(--serif);color:var(--ink);font-size:15px;letter-spacing:.06em}
+  footer .note{margin-top:8px}
+
+  @media (max-width:430px){
+    body{padding:26px 14px 48px}
+    .hero h1{font-size:26px}
+    .ticket{padding:22px 20px 18px}
+    .ticket h3{font-size:19px;padding-right:54px}
+    .perf{margin-left:-20px;margin-right:-20px}
+    .sec-head{flex-wrap:wrap;gap:8px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .ticket{opacity:1;transform:none;animation:none}
+    .cta{transition:none}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="hero">
+      <div class="eyebrow">精選異業聯盟 · 分潤好康</div>
+      <div class="chop" aria-hidden="true"><span>芸琪推薦</span></div>
+      <h1>芸琪的好康推薦</h1>
+      <p>我精選合作的夥伴方案，從 AI 學習到購物帶貨都有。凡註明「芸琪推薦」即享專屬好康。</p>
+      <div class="hint">🎁 前往後別忘了註明「芸琪推薦」</div>
+    </header>
+
+    <!-- ===== AI × 數位成長 ===== -->
+    <section class="section ai">
+      <div class="sec-head">
+        <span class="sec-eyebrow">學習・工具・自動化</span>
+        <h2>AI × 數位成長</h2>
+        <span class="rule"></span>
+      </div>
+
+      <article class="ticket ai">
+        <div class="mini-seal" aria-hidden="true"><span>芸琪</span></div>
+        <span class="tag">AI 課程</span>
+        <h3>AI 365 全修班</h3>
+        <div class="tagline">月月新課 × 線下實作 × 當天出成品 ✨</div>
+        <div class="desc">帶你入 AI 圈：共學、共享、共好。邊學邊做，當天就帶走自己的作品。</div>
+        <div class="perk">🎁 報名時註明芸琪推薦，享專屬好康</div>
+        <div class="perf"></div>
+        <a class="cta" href="https://ai365-class-g7zyex0.gamma.site" target="_blank" rel="noopener noreferrer">看課程詳情<span class="arrow">→</span></a>
+      </article>
+
+      <article class="ticket ai">
+        <div class="mini-seal" aria-hidden="true"><span>芸琪</span></div>
+        <span class="tag">免費課程</span>
+        <h3>945 AI 獲客大聯盟</h3>
+        <div class="tagline">100 堂免費 AI 課，免費學</div>
+        <div class="desc">加入 AI 獲客大聯盟，免費上手 AI 獲客技能，把工具變成你的神隊友。</div>
+        <div class="perk">🎁 加入時註明芸琪推薦，享專屬好康</div>
+        <div class="perf"></div>
+        <a class="cta" href="https://945ai.com/mgm/HenDuT" target="_blank" rel="noopener noreferrer">免費報名<span class="arrow">→</span></a>
+      </article>
+
+      <article class="ticket ai">
+        <div class="mini-seal" aria-hidden="true"><span>芸琪</span></div>
+        <span class="tag">LINE × AI 工具</span>
+        <h3>神隊友數位</h3>
+        <div class="tagline">LINE 多頁訊息 × AI 自動化</div>
+        <div class="desc">用 LINE 多頁訊息結合 AI 與自動化，打造高質感互動、精準追蹤與定期聯繫，提升信任與成交力。</div>
+        <div class="perk">🎁 洽詢時註明芸琪推薦，享專屬好康</div>
+        <div class="perf"></div>
+        <a class="cta" href="https://godteammate.com.tw/linecard/lineAIweb/c2dc268aef32095543e3063cde0cefc8/jwatejlt.html" target="_blank" rel="noopener noreferrer">了解方案<span class="arrow">→</span></a>
+      </article>
+    </section>
+
+    <!-- ===== 購物 × 帶貨分潤 ===== -->
+    <section class="section shop">
+      <div class="sec-head">
+        <span class="sec-eyebrow">消費・直播・回饋</span>
+        <h2>購物 × 帶貨分潤</h2>
+        <span class="rule"></span>
+      </div>
+
+      <article class="ticket shop">
+        <div class="mini-seal" aria-hidden="true"><span>芸琪</span></div>
+        <span class="tag">購物商城</span>
+        <h3>風霈網路購物商城</h3>
+        <div class="tagline">日常採買就能回饋</div>
+        <div class="desc">生活好物商城，透過此連結加入會員，消費同時累積回饋。</div>
+        <div class="perf"></div>
+        <a class="cta" href="https://www.fpshop.tw/mgm/v5ijz9" target="_blank" rel="noopener noreferrer">加入會員<span class="arrow">→</span></a>
+      </article>
+
+      <article class="ticket shop">
+        <div class="mini-seal" aria-hidden="true"><span>芸琪</span></div>
+        <span class="tag">直播帶貨</span>
+        <h3>蝦皮直播帶貨</h3>
+        <div class="tagline">免囤貨，分享就能分潤</div>
+        <div class="desc">不必進貨、不必出貨，代言分享連結或開直播帶貨即可參與分潤。先看說明了解怎麼開始。</div>
+        <div class="perf"></div>
+        <a class="cta" href="https://drive.google.com/file/d/13xDVlfRa1sP0ALuXcJBTE-MowaOuO0fV/view" target="_blank" rel="noopener noreferrer">看說明<span class="arrow">→</span></a>
+      </article>
+    </section>
+
+    <footer>
+      <strong>芸琪 · 精選異業聯盟推薦</strong>
+      <div class="note">點擊前往後，記得在報名或詢問時註明「芸琪推薦」，才享得到專屬好康 🎁</div>
+      <!-- 想加聯絡方式可在這裡補上，例如：
+      <div class="note">聯絡芸琪：LINE @你的ID</div>
+      -->
+    </footer>
+
+  </div>
+</body>
+</html>
