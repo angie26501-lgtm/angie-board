@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宜蘭長照筆記｜發文進度表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#eef1ea;--surface:#fff;--ink:#22302a;--muted:#6c7a6f;--primary:#1f4a3a;--primary-soft:#e6efe9;--accent:#c79348;--accent-soft:#f7edda;--urgent:#b14a31;--urgent-soft:#f6e4de;--blue:#3a6b7a;--blue-soft:#e2eef1;--line:#dde3d9;--shadow:0 2px 14px rgba(31,74,58,.07);}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:"Noto Sans TC",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding-bottom:30px;}
+  .wrap{max-width:600px;margin:0 auto;padding:0 14px;}
+  header{background:linear-gradient(155deg,#1f4a3a,#2c5d4a);color:#fff;padding:20px 0 24px;border-radius:0 0 22px 22px;box-shadow:var(--shadow);}
+  .brand{display:flex;align-items:center;gap:8px;font-size:14px;letter-spacing:1px;opacity:.85;font-weight:500;}
+  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .h1{font-size:22px;font-weight:900;margin-top:6px;}
+  .sub{font-size:13.5px;opacity:.72;margin-top:2px;}
+  .prog{margin-top:16px;background:rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;}
+  .prow{display:flex;justify-content:space-between;font-size:14px;font-weight:700;}
+  .pbar{height:8px;background:rgba(255,255,255,.18);border-radius:999px;margin-top:9px;overflow:hidden;}
+  .pfill{height:100%;background:var(--accent);border-radius:999px;transition:width .3s;}
+  .phase{font-size:14px;font-weight:900;color:var(--primary);margin:20px 4px 8px;display:flex;align-items:center;gap:8px;}
+  .phase::before{content:"";width:16px;height:3px;background:var(--accent);border-radius:2px;}
+  .card{background:var(--surface);border-radius:14px;margin-bottom:9px;box-shadow:var(--shadow);overflow:hidden;border-left:3px solid transparent;}
+  .card.posted{border-left-color:var(--primary);opacity:.72;}
+  .card.golden{border-left-color:var(--accent);}
+  .chead{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;cursor:pointer;}
+  .chk{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;margin-top:1px;transition:.15s;}
+  .card.posted .chk{background:var(--primary);border-color:var(--primary);}
+  .cbody{flex:1;min-width:0;}
+  .ctop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);}
+  .cdate{font-weight:700;color:var(--ink);}
+  .ctitle{font-weight:700;font-size:15.5px;margin-top:3px;word-break:break-word;}
+  .card.posted .ctitle{text-decoration:line-through;}
+  .badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+  .b{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;}
+  .b.care{background:var(--primary-soft);color:var(--primary);}
+  .b.home{background:var(--blue-soft);color:var(--blue);}
+  .b.talk{background:var(--accent-soft);color:#9a6b1e;}
+  .b.money{background:#f0e6d0;color:#8a6a2a;}
+  .b.ready{background:var(--primary-soft);color:var(--primary);}
+  .b.todo{background:var(--accent-soft);color:#9a6b1e;}
+  .b.check{background:var(--urgent-soft);color:var(--urgent);}
+  .arw{color:#c4ccc1;font-size:13px;margin-top:3px;transition:transform .2s;}
+  .card.open .arw{transform:rotate(90deg);}
+  .ctext{display:none;padding:0 14px 14px;}
+  .card.open .ctext{display:block;}
+  .posttext{background:var(--bg);border-radius:10px;padding:12px;font-size:14px;white-space:pre-wrap;word-break:break-word;line-height:1.65;color:#2f3d34;}
+  .nodraft{background:var(--bg);border-radius:10px;padding:12px;font-size:13.5px;color:var(--muted);}
+  .copybtn{width:100%;margin-top:9px;background:var(--primary);color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:700;padding:11px;border-radius:10px;cursor:pointer;}
+  .copybtn:active{opacity:.85;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14.5px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .note{font-size:12.5px;color:var(--muted);text-align:center;margin:16px 8px 0;line-height:1.6;}
+  .syncb{margin-top:10px;font-size:13px;font-weight:700;background:rgba(255,255,255,.12);border:none;color:#fff;padding:5px 12px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .syncb .sdot{width:7px;height:7px;border-radius:50%;background:#9bbfae;}
+  .syncb.ok .sdot{background:#7fd6a2;} .syncb.busy .sdot{background:var(--accent);} .syncb.off .sdot{background:#e0a08a;}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>宜蘭長照筆記</div>
+    <div class="h1">發文進度表</div>
+    <div class="sub">每週一發 · 點篇目可展開複製稿件</div>
+    <button class="syncb" id="syncBtn" onclick="syncMenu()"><span class="sdot"></span><span id="syncTxt">本機模式</span></button>
+    <div class="prog">
+      <div class="prow"><span>已發進度</span><span id="progTxt">0 / 28</span></div>
+      <div class="pbar"><div class="pfill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+<div class="wrap" id="board"></div>
+<div class="note">✅打勾＝已發布 · 資料存在此裝置 · 標🔴的發文前務必查證政府數字<br>發文原則：週一早8-9或晚8-9 · 個人身分 · 不放連結/hashtag · 記私訊數</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY="ilan_post_progress_v1";
+const T={care:"🏥長照實務",home:"🏠居家安全",talk:"💬家庭溝通",money:"💰財務"};
+const POSTS=[
+{n:1,d:"8/18",wd:"週二",t:"宜蘭長照第一步該打給誰？1966與在地窗口",ty:"care",st:"posted",draft:"posted",ph:1},
+{n:2,d:"8/24",wd:"週一",t:"輔具不用急著買，宜蘭可以先免費借",ty:"home",draft:"ready",ph:1},
+{n:3,d:"8/31",wd:"週一",t:"評估那天，長輩說「我可以啦」會讓補助少很多",ty:"care",draft:"ready",ph:1},
+{n:"3+",d:"9月",wd:"延伸加篇",t:"為什麼長輩總說「不用啦」，最後卻是自己吃虧",ty:"talk",draft:"ready",ph:1,
+text:`前陣子跟一位物理治療師聊天，他說了一句話，我一直記到現在：
+
+「收費這種事，最好是跟子女講，不要直接跟長輩談。」
+
+為什麼？因為長輩一聽到「要花錢」，第一個反應幾乎都是——「不用啦、不用啦，我自己來就好」，然後就把一個本來對他很有幫助的服務，直接推掉了。
+
+📌 但很多長輩不知道的是：
+・這些長照服務，多數都有政府補助
+・不是全額自費，長輩自己通常只要負擔一部分
+・大部分，是由長照計畫幫忙出的
+
+換句話說，長輩以為「很貴、捨不得」，實際上自己要出的，往往比想像中少。是那句「不用啦」，讓他錯過了本來能減輕全家負擔的幫忙。
+
+💡 給照顧者的一個提醒：
+如果長輩因為「怕花錢」而拒絕，先別急著說服他。你可以自己先去搞清楚細節——很多時候你會發現，沒有想像中的負擔。等你心裡有數了，再跟長輩說「這個大部分政府有補助，我們只要出一部分」，他會比較願意接受。
+
+📍 想了解各項服務的補助與自付，可以打：
+・長照專線 1966
+・宜蘭縣長期照顧管理中心 03-9359990
+
+早一點知道，就少一次「因為捨不得，而錯過的幫忙」。
+
+（各項服務的補助與自付會依個別狀況與最新公告不同，實際情形請以 1966 或長照中心說明為準。）`},
+{n:4,d:"9/7",wd:"週一",t:"醫院不會主動告訴你——出院前一定要問這句話",ty:"care",draft:"ready",ph:1},
+{n:5,d:"9/14",wd:"週一",t:"長照四包錢是什麼？為什麼不能互相挪用",ty:"care",draft:"ready",ph:1},
+{n:6,d:"9/21",wd:"週一",t:"外籍看護免巴氏量表的最新條件",ty:"care",draft:"ready",ph:1},
+{n:7,d:"9/28",wd:"週一",t:"想孝順，先問爸媽「最不方便的是什麼」",ty:"talk",draft:"ready",ph:1,
+text:`重陽節快到了，很多人會想帶爸媽出去吃頓飯、買點補品。
+
+但這幾年陪我媽走過來，我發現真正的孝順，常常不是送什麼，而是——你有沒有看見他哪裡開始不方便了。
+
+長輩最會的一件事，就是「報喜不報憂」。你問他好不好，他一定說「好啦好啦，不用擔心」。所以與其問「需不需要」，不如換個問法：
+
+📌 這幾件事，這次回家可以偷偷觀察：
+・他站起來的時候，手會不會先扶著什麼？
+・上下樓梯、進出浴室，動作是不是變慢、變小心了？
+・以前愛吃的東西，是不是剩得比較多？（可能是牙口或吞嚥）
+・話變少、不太想出門，有時候不是懶，是不安。
+
+這些他不會主動說。但只要你看到了，很多事就能提早準備，而不是等跌倒、等住院才手忙腳亂。
+
+💡 一個提醒：長輩說「我可以啦」的時候，那句話多半不是真的沒問題，是不想變成你的負擔。聽懂這一層，比買什麼禮物都珍貴。
+
+今年重陽，除了吃飯，也花十分鐘，好好看看他們。`},
+{n:8,d:"10/5",wd:"週一",t:"居家服務、日照、外籍看護，我家該選哪一種？",ty:"care",draft:"ready",ph:2},
+{n:9,d:"10/12",wd:"週一",t:"長輩沒說出口的不方便：她的手都扶在哪裡？",ty:"home",draft:"todo",ph:2},
+{n:10,d:"10/19",wd:"週一",t:"家裡最容易跌倒的五個地方（浴室不是第一名）",ty:"home",draft:"ready",ph:2,
+text:`長輩跌倒，很多人以為是在外面。其實最常發生的，是在他住了幾十年、最熟悉的家裡。
+
+因為熟，所以放鬆；因為放鬆，所以不小心。
+
+📌 家裡這五個地方，最容易出事：
+・床邊——半夜起來上廁所，剛醒、腳軟、光線暗，是最危險的一刻
+・浴室——濕滑，但因為大家都會注意，反而不是第一名
+・門檻——高低差一兩公分就夠絆倒
+・樓梯——尤其最後一階，常被誤判
+・夜間走道——從房間到廁所那段沒有燈的路
+
+💡 小改善，效果很大：床邊放小夜燈、浴室加防滑墊與扶手、門檻做斜角、走道留一盞感應燈。這些不用大工程，卻能少一次骨折。
+
+📍 在地資源：如果需要裝扶手、改門檻，可以先打1966長照專線評估，部分項目長照有補助。輔具也可以先借不用急著買。
+
+一次跌倒，往往就是長照的起點。與其之後照顧，不如現在先把家裡走一遍。`},
+{n:11,d:"10/26",wd:"週一",t:"請了看護之後，你怎麼知道爸媽過得好不好？",ty:"talk",draft:"ready",ph:2},
+{n:12,d:"11/2",wd:"週一",t:"換季了：長輩的三個健康訊號別忽略",ty:"care",draft:"check",ph:2,
+text:`天氣一轉涼，長輩的身體常會發出一些訊號。他們多半不會說，要靠我們主動看。
+
+📌 這三個變化，換季時特別要留意：
+・血壓比較不穩——早晚溫差大，血壓容易波動，本來有在吃藥的更要按時量、按時吃
+・舊傷、關節更痛——變冷會讓退化性關節、開過刀的地方更不舒服，活動力跟著下降
+・食慾和精神變差——吃得少、懶得動、話變少，有時是季節影響，但若持續就要注意
+
+💡 關鍵不是「有沒有這些變化」，而是「會不會持續、會不會越來越明顯」。偶爾一兩天沒關係；如果一直這樣，就該帶去看醫生，不要自己猜。
+
+長輩總說「小事啦、過幾天就好」。但很多大狀況，都是從被忽略的小訊號開始的。
+
+（以上為一般照顧提醒，非醫療診斷，身體不適請就醫。）`},
+{n:13,d:"11/9",wd:"週一",t:"長照補助能給多少？自費缺口通常有多大",ty:"care",draft:"ready",ph:2},
+{n:14,d:"11/16",wd:"週一",t:"探病的時候，可以做什麼？",ty:"talk",draft:"ready",ph:2},
+{n:15,d:"11/23",wd:"週一",t:"復健不只是身體：長輩的情緒也需要復健",ty:"talk",draft:"ready",ph:2},
+{n:16,d:"11/30",wd:"週一",t:"家裡裝扶手、改門檻，長照其實有補助",ty:"home",draft:"check",ph:2,
+text:`很多人以為家裡要做無障礙——裝扶手、防滑、改門檻、做斜坡——都得自己花錢。其實，長照2.0有一項「居家無障礙環境改善」的補助，很多人不知道。
+
+📌 大方向是這樣：
+・目的是讓長輩在家行動更安全、減少跌倒
+・常見可改善項目：扶手、止滑、消除高低差、加寬走道、浴廁改善等
+・要先經過長照需求評估，由專業人員到府看過、認定需要，才能申請
+
+📍 宜蘭怎麼問：
+・打1966長照專線，或
+・洽宜蘭縣長期照顧管理中心 03-9359990
+他們會依長輩的狀況，告訴你符不符合、能補多少、流程怎麼走。
+
+💡 一個提醒：這類補助通常要先申請、經核定才施工，不是先做好再來報帳。所以要改之前，先問清楚順序，才不會白花錢。
+
+（補助內容以官方最新公告為準，查核日期＿＿。）
+
+🔴【發文前務必查證】致電03-9359990確認：可補助項目、額度/自付比例、一生一次或可分次、申請與施工順序。數字沒查到就不要寫死。`},
+{n:17,d:"12/7",wd:"週一",t:"照顧的人被懷疑，沒照顧的人不放心",ty:"talk",draft:"ready",ph:3},
+{n:18,d:"12/14",wd:"週一",t:"年底了，幫爸媽做一份「家庭財務急救包」",ty:"money",draft:"ready",ph:3,
+text:`年底大掃除，除了整理家裡，我想建議一件事：幫爸媽（也幫自己）做一份「家庭財務急救包」。
+
+不是要你現在動用什麼，而是——萬一有一天長輩突然住院、無法自己處理事情，你知道東西在哪嗎？
+
+我陪家人走過那段路才深刻體會：慌亂的往往不是錢不夠，是「不知道保單放哪、帳戶有哪些、密碼是什麼」。
+
+📌 一份急救包，至少該有這五樣：
+・保單清單——有哪幾張、哪家公司、聯絡窗口是誰
+・銀行帳戶清單——有哪些帳戶（不用寫密碼，寫「在哪本存摺、找得到人」就好）
+・重要證件位置——身分證、印章、健保卡放哪
+・常吃的藥與病史——住院第一時間就會被問
+・緊急聯絡人——誰能做決定、誰負責什麼
+
+💡 重點不是「交出去」，是「有人知道在哪」。這份東西平常鎖好，但家裡至少要有一個人知道它存在、放在哪裡。
+
+趁過年前家人會聚在一起，把這件事講一講。不是觸霉頭，是幫彼此少走一段慌亂的路。`},
+{n:19,d:"12/21",wd:"週一",t:"你的保單受益人，多久沒看過了？",ty:"money",draft:"ready",ph:3,
+text:`一張保單，買的時候填了受益人，然後……是不是好幾年沒再看過了？
+
+這件事很小，卻常在最關鍵的時候出問題。
+
+📌 為什麼要定期看一眼：
+・家庭狀況會變——結婚、離婚、生子、長輩過世，這些都可能讓當初填的受益人「不再是你現在想給的人」
+・受益人資料過期——搬家、改名、聯絡方式變了，理賠時可能找不到人、卡很久
+・順序沒安排好——受益人可以填不只一位、也可以排順序，很多人當年只隨手填了一個
+
+💡 一個提醒：如果受益人欄留白或只寫「法定繼承人」，理賠金會按法定順序分配，未必是你心裡想的那樣。
+
+這不需要你懂什麼複雜的東西，只要做一件事：把保單拿出來，看一下受益人欄，覺得不對就打給你的業務員或保險公司調整。
+
+年底了，順手檢查這一欄，花不到五分鐘，卻可能省下未來的一場麻煩。
+
+（以上是提醒定期檢視保單的觀念，個人保單怎麼安排，請跟你的保險業務員或保險公司確認。）`},
+{n:20,d:"12/28",wd:"週一",t:"回顧這一年：照顧路上，我學到的五件事",ty:"talk",draft:"ready",ph:3,
+text:`又到年底了。這一年，我陪家人走過一段照顧的路，也在宜蘭知識+這裡，每週把走過的整理給大家。
+
+年末，想把這一年最深的五個體會，留給正在路上、或即將上路的你。
+
+📌 一、長照不是一筆錢就能解決的事
+錢重要，但真正讓家庭慌的，是「誰陪看診、誰做決定、誰知道保單放哪」。
+
+📌 二、最難的不是照顧一天，是不知道要走多久
+心理準備比體力準備更需要。把它當長期抗戰，才不會第一個月就燒乾。
+
+📌 三、長輩說「我可以」，多半是不想成為負擔
+聽懂這句背後的話，比聽字面重要。
+
+📌 四、照顧者也需要被照顧
+你不必當超人。求助不是失敗，是讓這條路走得久一點。
+
+📌 五、提早準備，是給全家的溫柔
+趁還能好好說話、還能做決定的時候，把想法、資料、責任先理好。
+
+💡 這一年謝謝每一位在留言區分享自己故事的朋友。你們的經驗，也成了別人的路標。
+
+新的一年，繼續一起把這條路，走得清楚一點。`},
+{n:21,d:"1/4",wd:"週一",t:"新的一年，先幫家裡的財務做一次盤點",ty:"money",draft:"ready",ph:3,
+text:`新年新希望，很多人想到的是運動、存錢。我想建議一個更根本的：幫家裡做一次「財務盤點」。
+
+不是要你算得多精，而是把幾個基本問題，一家人弄清楚。
+
+📌 五個問題，先問得出答案就好：
+・家裡有哪些收入來源？（薪水、退休金、租金…）
+・每個月大概花多少、花在哪？
+・有哪些資產（房子、存款、保單、投資）？
+・有沒有負債（房貸、車貸、借款）？
+・萬一有人突然倒下，這些東西找得到、有人知道嗎？
+
+💡 盤點的重點不是數字漂不漂亮，是「心裡有底」。知道錢在哪、風險在哪，遇到事情才不會全家亂成一團。
+
+很多家庭不是沒有錢，是「不知道自己有什麼、缺什麼」。年初花一個下午理清楚，這一年會踏實很多。
+
+（這是鼓勵大家做基礎財務整理的觀念分享，不涉及個別投資或商品建議。）`},
+{n:22,d:"1/11",wd:"週一",t:"爸媽失智之後，誰能處理他的錢？",ty:"money",draft:"ready",ph:3,
+text:`這是一個很多家庭沒想過、但一旦發生就很棘手的問題：
+
+如果爸媽失智了，連自己都認不得，那他名下的錢、房子，誰能幫他處理？
+
+很多人以為「我是子女，當然可以」。但實際上，一旦長輩被認定無法自己做決定，銀行、地政這些單位，不會因為你是子女就讓你動他的財產——這是在保護長輩，避免被有心人侵占。
+
+📌 需要先知道的觀念（只談方向，程序請洽專業）：
+・法律上有制度，可以在長輩還清醒時，先安排好「將來由誰來協助管理」
+・也有制度處理「已經失能、來不及事先安排」的情況
+・這兩條路，事前安排的那條，通常單純很多
+
+💡 最重要的一句話：這件事要趁長輩還清醒、還能表達意願的時候談、先安排。等到失智之後才處理，家人會走得很辛苦。
+
+這牽涉法律程序，細節要問專業（律師、法律扶助）。但「要不要提早準備」這個決定，是全家現在就能一起想的。
+
+（本篇只談觀念，不提供法律程序與個案判斷。實際辦理請洽律師或法律扶助基金會。）`},
+{n:23,d:"1/18",wd:"週一",t:"房子登記在誰名下？很多家庭答不出來",ty:"money",draft:"ready",ph:3,
+text:`問一個簡單的問題：你家的房子，現在登記在誰名下？
+
+你可能會愣一下。這很正常——很多家庭真的答不出來，因為「一直都住在這，誰在意登記」。
+
+但這件事，在幾個時刻會突然變得很重要：長輩過世、要辦貸款、要賣房、家人之間要分配的時候。
+
+📌 這幾件事，趁大家還在時弄清楚：
+・房子登記在誰名下？是一個人，還是共有？
+・有沒有貸款？還剩多少？
+・當初買的時候，錢是誰出的？（有時和登記名字不同，將來容易有爭議）
+
+💡 提醒：這不是要現在就過戶、就分配。而是先把「現況」弄清楚。很多家庭的紛爭，不是因為有人壞，是因為「大家記得的版本不一樣」。
+
+趁過年家人聚齊，把這些基本事實對一對。講清楚，是為了以後不用猜、不用吵。
+
+（不動產過戶、繼承、稅務有專業程序，本篇僅提醒先了解現況，實際規劃請洽地政士或專業人員。）`},
+{n:24,d:"1/25",wd:"週一",t:"過年前，把想講的話先想好",ty:"talk",draft:"ready",ph:3,
+text:`再過幾天就要過年了。一家人難得聚在一起，這是好事——但也常常是「本來想好好講，結果吵起來」的場合。
+
+這幾年我學到：難得聚齊的時候，能不能好好講話，靠的不是運氣，是準備。
+
+📌 過年前，可以先想好這幾件事：
+・這次最想跟家人講清楚的一件事是什麼？（照顧分工？爸媽的意願？）
+・這件事由誰開口比較合適？在什麼時機講？
+・如果講到一半氣氛不對，怎麼先停、改天再談？
+
+💡 一個心法：目標是「把事情往前推一點」，不是「一次講完、當場決定」。能讓大家願意坐下來談，就已經成功一半。
+
+過年不是解決所有問題的時候，但可以是「開始談」的時候。把想講的話先想清楚，那頓年夜飯會順很多。`},
+{n:25,d:"2/1",wd:"週日",t:"回家過年，順便看看爸媽家有沒有這些危險",ty:"home",draft:"ready",ph:4,golden:true,
+text:`過年回家，除了吃飯團圓，其實是一年裡最好的一次「居家安全檢查」機會——因為你會待比較久，看得到平常看不到的細節。
+
+長輩自己住久了不會發現，但你回去待兩天，很多危險一眼就看得出來。
+
+📌 回家這幾天，順手看這幾個地方：
+・浴室：有沒有防滑？有沒有可以扶的地方？
+・床邊到廁所：半夜那段路，有沒有燈？
+・地板：有沒有堆雜物、電線、翹起來的地墊？
+・廚房：瓦斯有沒有忘記關的紀錄？有沒有裝防乾燒？
+・藥：有沒有過期、有沒有吃錯的風險？
+
+💡 提醒：不用一次全改。先看到、先記下來，回城市後再慢慢安排（裝扶手、加燈、清雜物）。很多長照的起點，就是一次本來可以避免的跌倒。
+
+📍 需要裝扶手、改門檻的，可打1966評估，部分項目長照有補助（可先借輔具、不用急著買）。
+
+今年回家，多留意一點。這比買什麼禮物都實在。`},
+{n:26,d:"2/8",wd:"週日",t:"年夜飯桌上，最不該吵的三件事",ty:"talk",draft:"ready",ph:4,golden:true,
+text:`年夜飯，一年一次全家到齊。氣氛好的時候很暖，但也最容易踩雷。
+
+這幾年觀察下來，飯桌上最容易吵、又最不值得吵的，是這三件事：
+
+📌 一、照顧的分工帳
+「都是我在顧」「你都沒出力」——這種話一出口，整桌就冷了。分工要談，但不是在飯桌上翻舊帳。
+
+📌 二、錢的比較
+誰出得多、誰出得少、爸媽比較疼誰。錢的事需要講清楚，但用「算帳」的方式講，只會傷感情。
+
+📌 三、逼問人生進度
+結婚了沒、生了沒、賺多少——長輩關心是真的，但問成連環炮，年輕人只想逃。
+
+💡 一個建議：飯桌上聊感情，正事另外找時間談。想講照顧分工、財務安排這些，可以飯後找個安靜時間、幾個關鍵的人談，比在一堆人面前攤開好太多。
+
+年夜飯的任務只有一個：讓大家願意明年再回來。其他的，慢慢來。`},
+{n:27,d:"2/15",wd:"週日",t:"兄弟姊妹難得聚齊，可以趁機講清楚的事",ty:"talk",draft:"ready",ph:4,golden:true,
+text:`過年，是兄弟姊妹一年裡少數能坐在一起的時候。與其只是吃飯、滑手機，其實可以趁這個機會，把幾件「平常各自忙、沒空談」的事對一下。
+
+尤其家裡有長輩要照顧的，這幾件事講清楚，能少掉一整年的誤會。
+
+📌 可以趁聚齊時談的：
+・爸媽現在的狀況，大家看到的一不一樣？（住得遠的常不知道實情）
+・如果哪天需要更多照顧，誰負責什麼？（出錢、出力、出時間，可以不同人）
+・爸媽的意願有沒有人問過？（想在家、想請人、還是…）
+・重要的東西（保單、證件、印章）放哪、誰知道？
+
+💡 心法：目標是「對齊資訊、分配責任」，不是「爭論對錯」。距離近的手足容易被當成理所當然的照顧者，這種不公平，講開了才不會累積成怨。
+
+一年見這麼幾次。把該講的講開，剩下的時間，好好當家人。`},
+{n:28,d:"2/22",wd:"週日",t:"年後回顧：長照申請的完整流程整理（懶人包）",ty:"care",draft:"ready",ph:4,
+text:`過完年，很多人因為這次回家，發現爸媽需要幫忙了。這篇把前面大家最常問的「長照到底怎麼申請」，整理成一張懶人包。
+
+📌 完整流程，五步走：
+・第一步：打1966（長照專線，市話手機都免費前5分鐘）說明長輩狀況
+・第二步：等評估——照管專員會到府，評估長輩的失能程度與需求
+・第三步：擬定計畫——依評估結果，安排適合的服務（居家照顧、日照、喘息、輔具、無障礙改善等）
+・第四步：開始使用——搭配部分負擔，多數家庭比自費省很多
+・第五步：定期檢視——狀況變了，服務可以再調整
+
+📍 宜蘭在地窗口：
+・長照專線 1966
+・宜蘭縣長期照顧管理中心 03-9359990
+
+💡 最重要的一句話：很多人卡住，不是不符合資格，是「不知道從哪開始」或「不好意思開口」。其實打1966只是諮詢，不用先決定什麼，先問清楚再說。
+
+早一點知道，就多一個選擇。這條路，你不用一個人摸索。
+
+（長照服務項目與部分負擔會依最新公告調整，發文前建議上衛福部長照專區或致電1966確認。）`},
+];
+const PHASES={1:"第一階段·建立信任（8–9月）",2:"第二階段·擴大實用（10–11月）",3:"第三階段·加入財務（12–1月）",4:"第四階段·農曆年（2月）"};
+
+let done=load();
+function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s);}catch(e){} 
+  const init={};POSTS.forEach(p=>init[p.n]=p.st==="posted");return init;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){}}
+function esc(s){return String(s||"").replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}
+
+function render(){
+  const board=document.getElementById("board");board.innerHTML="";
+  let cnt=0;
+  let curPh=0;
+  POSTS.forEach(p=>{
+    if(p.ph!==curPh){curPh=p.ph;const h=document.createElement("div");h.className="phase";h.textContent=PHASES[p.ph];board.appendChild(h);}
+    const posted=done[p.n];if(posted)cnt++;
+    const card=document.createElement("div");card.className="card"+(posted?" posted":"")+(p.golden?" golden":"");
+    const draftBadge=p.draft==="ready"?'<span class="b ready">✅稿已備</span>':p.draft==="todo"?'<span class="b todo">需寫</span>':p.draft==="check"?'<span class="b check">🔴發前查證</span>':'';
+    const goldBadge=p.golden?'<span class="b todo">⭐黃金篇</span>':'';
+    card.innerHTML=
+      '<div class="chead"><div class="chk" data-n="'+p.n+'">'+(posted?"✓":"")+'</div>'+
+      '<div class="cbody"><div class="ctop"><span class="cdate">'+p.d+' '+p.wd+'</span> · 第'+p.n+'篇</div>'+
+      '<div class="ctitle">'+esc(p.t)+'</div>'+
+      '<div class="badges"><span class="b '+p.ty+'">'+T[p.ty]+'</span>'+draftBadge+goldBadge+'</div></div>'+
+      '<span class="arw">▶</span></div>'+
+      '<div class="ctext">'+(p.text?'<div class="posttext">'+esc(p.text)+'</div><button class="copybtn" data-n="'+p.n+'">複製這篇貼文</button>':'<div class="nodraft">此篇稿件在你的既有檔案／宜蘭知識+專案，或標記為「需寫」。</div>')+'</div>';
+    board.appendChild(card);
+  });
+  document.getElementById("progTxt").textContent=cnt+" / "+POSTS.length;
+  document.getElementById("progFill").style.width=Math.round(cnt/POSTS.length*100)+"%";
+  board.querySelectorAll(".chead").forEach(el=>{
+    el.onclick=(e)=>{ if(e.target.classList.contains("chk"))return; el.parentElement.classList.toggle("open"); };
+  });
+  board.querySelectorAll(".chk").forEach(el=>{el.onclick=(e)=>{e.stopPropagation();const n=el.dataset.n;done[n]=!done[n];save();render();pushPost(n);};});
+  board.querySelectorAll(".copybtn").forEach(el=>{el.onclick=(e)=>{e.stopPropagation();const p=POSTS.find(x=>x.n==el.dataset.n);navigator.clipboard.writeText(p.text).then(()=>toast("已複製，可貼到社團")).catch(()=>prompt("手動複製：",p.text));};});
+}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
+
+/* ===== Google Sheets 同步（POSTS 分頁·與保戶服務同一張表）===== */
+const URL_KEY="angie_webapp_url";
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbyJDYsUdpCHoH52hZdzGezlrA_XXctFvhRribq918QXgbRWg5T2M-Y0QHHHr_WkYxxcUg/exec";
+let SYNC_URL=localStorage.getItem(URL_KEY)||DEFAULT_URL;
+function setSync(state,txt){const b=document.getElementById("syncBtn");b.className="syncb "+state;document.getElementById("syncTxt").textContent=txt;}
+async function pull(){
+  if(!SYNC_URL){setSync("","本機模式");return;}
+  setSync("busy","同步中…");
+  try{
+    const r=await fetch(SYNC_URL+"?sheet=POSTS",{method:"GET"});
+    const j=await r.json();
+    if(j.ok){ if(j.items){ j.items.forEach(it=>{ done[it.id]=!!Number(it.posted); }); } save(); render(); setSync("ok","已同步"); }
+    else throw 0;
+  }catch(e){ setSync("off","離線·用本機"); }
+}
+async function pushPost(id){
+  if(!SYNC_URL)return; setSync("busy","儲存中…");
+  try{ await fetch(SYNC_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({sheet:"POSTS",action:"upsert",item:{id:String(id),posted:done[id]?1:0}})}); setSync("ok","已同步"); }
+  catch(e){ setSync("off","離線·用本機"); }
+}
+function syncMenu(){
+  const cur=SYNC_URL?"目前已連結（與保戶服務同一張表）。":"尚未連結。";
+  const url=prompt(cur+"\n貼上 Apps Script /exec 網址（留空＝取消同步）：",SYNC_URL);
+  if(url===null)return;
+  SYNC_URL=url.trim(); localStorage.setItem(URL_KEY,SYNC_URL);
+  if(SYNC_URL){pull();toast("已連結，開始同步");}else{setSync("","本機模式");toast("已切回本機模式");}
+}
+
+render();
+if(SYNC_URL){ pull(); } else { setSync("","本機模式"); }
+</script>
+</body>
+</html>
