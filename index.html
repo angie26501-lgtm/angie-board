@@ -51,6 +51,10 @@
   .nodraft{background:var(--bg);border-radius:10px;padding:12px;font-size:13.5px;color:var(--muted);}
   .copybtn{width:100%;margin-top:9px;background:var(--primary);color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:700;padding:11px;border-radius:10px;cursor:pointer;}
   .copybtn:active{opacity:.85;}
+  .linkbox{margin-top:9px;font-size:13.5px;}
+  .linkbox a{color:var(--primary);font-weight:700;word-break:break-all;}
+  .addlink,.editlink{color:var(--accent);font-weight:700;cursor:pointer;}
+  .addlink:active,.editlink:active{opacity:.7;}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14.5px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .note{font-size:12.5px;color:var(--muted);text-align:center;margin:16px 8px 0;line-height:1.6;}
@@ -385,6 +389,16 @@ text:`過完年，很多人因為這次回家，發現爸媽需要幫忙了。�
 const PHASES={1:"第一階段·建立信任（8–9月）",2:"第二階段·擴大實用（10–11月）",3:"第三階段·加入財務（12–1月）",4:"第四階段·農曆年（2月）"};
 
 let done=load();
+let links=loadLinks();
+function loadLinks(){try{const s=localStorage.getItem(KEY+"_links");if(s)return JSON.parse(s);}catch(e){} return {"1":"https://www.facebook.com/share/p/1E8xuVJ91v/"};}
+function saveLinks(){try{localStorage.setItem(KEY+"_links",JSON.stringify(links));}catch(e){}}
+function editLink(n){
+  const cur=links[n]||"";
+  const v=prompt("貼上第"+n+"篇的社團貼文網址：\n（在社團找到那則貼文 → 右上「⋯」→ 複製連結）",cur);
+  if(v===null)return;
+  if(v.trim()==="")delete links[n];else links[n]=v.trim();
+  saveLinks();render();pushPost(n);
+}
 function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s);}catch(e){} 
   const init={};POSTS.forEach(p=>init[p.n]=p.st==="posted");return init;}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){}}
@@ -406,7 +420,9 @@ function render(){
       '<div class="ctitle">'+esc(p.t)+'</div>'+
       '<div class="badges"><span class="b '+p.ty+'">'+T[p.ty]+'</span>'+draftBadge+goldBadge+'</div></div>'+
       '<span class="arw">▶</span></div>'+
-      '<div class="ctext">'+(p.text?'<div class="posttext">'+esc(p.text)+'</div><button class="copybtn" data-n="'+p.n+'">複製這篇貼文</button>':'<div class="nodraft">此篇稿件在你的既有檔案／宜蘭知識+專案，或標記為「需寫」。</div>')+'</div>';
+      '<div class="ctext">'+(p.text?'<div class="posttext">'+esc(p.text)+'</div><button class="copybtn" data-n="'+p.n+'">複製這篇貼文</button>':'<div class="nodraft">此篇稿件在你的既有檔案／宜蘭知識+專案，或標記為「需寫」。</div>')+
+      '<div class="linkbox" data-n="'+p.n+'">'+(links[p.n]?'🔗 <a href="'+esc(links[p.n])+'" target="_blank" rel="noopener">已存貼文連結 · 點看數據 →</a> <span class="editlink" data-n="'+p.n+'">改</span>':'<span class="addlink" data-n="'+p.n+'">🔗 發文後貼上這篇的社團連結</span>')+'</div>'+
+      '</div>';
     board.appendChild(card);
   });
   document.getElementById("progTxt").textContent=cnt+" / "+POSTS.length;
@@ -416,6 +432,8 @@ function render(){
   });
   board.querySelectorAll(".chk").forEach(el=>{el.onclick=(e)=>{e.stopPropagation();const n=el.dataset.n;done[n]=!done[n];save();render();pushPost(n);};});
   board.querySelectorAll(".copybtn").forEach(el=>{el.onclick=(e)=>{e.stopPropagation();const p=POSTS.find(x=>x.n==el.dataset.n);navigator.clipboard.writeText(p.text).then(()=>toast("已複製，可貼到社團")).catch(()=>prompt("手動複製：",p.text));};});
+  board.querySelectorAll(".addlink").forEach(el=>{el.onclick=(e)=>{e.stopPropagation();editLink(el.dataset.n);};});
+  board.querySelectorAll(".editlink").forEach(el=>{el.onclick=(e)=>{e.stopPropagation();editLink(el.dataset.n);};});
 }
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
 
@@ -430,13 +448,13 @@ async function pull(){
   try{
     const r=await fetch(SYNC_URL+"?sheet=POSTS",{method:"GET"});
     const j=await r.json();
-    if(j.ok){ if(j.items){ j.items.forEach(it=>{ done[it.id]=!!Number(it.posted); }); } save(); render(); setSync("ok","已同步"); }
+    if(j.ok){ if(j.items){ j.items.forEach(it=>{ done[it.id]=!!Number(it.posted); if(it.link) links[it.id]=it.link; }); } save();saveLinks(); render(); setSync("ok","已同步"); }
     else throw 0;
   }catch(e){ setSync("off","離線·用本機"); }
 }
 async function pushPost(id){
   if(!SYNC_URL)return; setSync("busy","儲存中…");
-  try{ await fetch(SYNC_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({sheet:"POSTS",action:"upsert",item:{id:String(id),posted:done[id]?1:0}})}); setSync("ok","已同步"); }
+  try{ await fetch(SYNC_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({sheet:"POSTS",action:"upsert",item:{id:String(id),posted:done[id]?1:0,link:links[id]||""}})}); setSync("ok","已同步"); }
   catch(e){ setSync("off","離線·用本機"); }
 }
 function syncMenu(){
